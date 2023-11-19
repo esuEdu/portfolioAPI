@@ -10,6 +10,7 @@ const orderRouter = require('./API/Routes/order');
 mongoose.connect('mongodb+srv://EduardoVieira:'+ process.env.MONGO_ATLAS_PW +'@cluster0.kst562m.mongodb.net/?retryWrites=true&w=majority');
 
 app.use(morgan('dev'))
+app.use('/uploads', express.static('uploads'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
