@@ -31,49 +31,51 @@ router.post("/signup", async (req, res) => {
     }
 });
 
-router.post("/login", (req, res, next) => {
-    User.find({ email: req.body.email })
-      .exec()
-      .then(user => {
-        if (user.length < 1) {
-          return res.status(401).json({
-            message: "Auth failed"
-          });
+router.post('/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        const user = await User.findOne({ email }).exec();
+
+        if (!user) {
+            return res.status(401).json({ message: "Authentication failed. Invalid email or password." });
         }
-        bcrypt.compare(req.body.password, user[0].password, (err, result) => {
-          if (err) {
-            return res.status(401).json({
-              message: "Auth failed"
-            });
-          }
-          if (result) {
-            const token = jwt.sign(
-              {
-                email: user[0].email,
-                userId: user[0]._id
-              },
-              "secret",
-              {
-                  expiresIn: "1h"
-              }
-            );
-            return res.status(200).json({
-              message: "Auth successful",
-              token: token
-            });
-          }
-          res.status(401).json({
-            message: "Auth failed"
-          });
-        });
-      })
-      .catch(err => {
-        console.log(err);
-        res.status(500).json({
-          error: err
-        });
-      });
-  });
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+
+        if (!isPasswordValid) {
+            return res.status(401).json({ message: "Authentication failed. Invalid email or password." });
+        }
+
+        // Create and sign a JWT token
+        jwt.sign(
+            {
+                userId: user._id,
+                email: user.email
+            },
+            process.env.MONGO_ATLAS_PW, // Use a more generic name like JWT_SECRET
+            {
+                expiresIn: '1h' // Adjust the expiry time as needed
+            },
+            function(err, token){
+                if (err) {
+                    console.error(err);
+                    res.status(500).json({ error: "Internal Server Error" });
+                } else {
+                    // Send the token in the response
+                    res.status(200).json({
+                        message: 'Authentication successful',
+                        token: token
+                    });
+                }
+            }
+        );
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
 
 
 
