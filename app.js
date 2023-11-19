@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 
 const productRouter = require('./API/Routes/products');
 const orderRouter = require('./API/Routes/order');
+const userRouter = require('./API/Routes/user');
 
 mongoose.connect('mongodb+srv://EduardoVieira:'+ process.env.MONGO_ATLAS_PW +'@cluster0.kst562m.mongodb.net/?retryWrites=true&w=majority');
 
@@ -32,6 +33,7 @@ app.use((req, res, next) => {
 
 app.use('/products', productRouter);
 app.use('/orders', orderRouter);
+app.use("/user", userRouter);
 
 app.use((req, res, next) => {
     const error = new Error("not found");
