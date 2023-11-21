@@ -68,7 +68,7 @@ router.get("/", async (req, res) => {
 });
 
 // Create a new product
-router.post("/", upload.single("productImage"), checkAuth, async (req, res) => {
+router.post("/", checkAuth, upload.single("productImage"),  async (req, res) => {
   try {
     const product = new Product({
       _id: new mongoose.Types.ObjectId(),
@@ -129,7 +129,7 @@ router.get("/:productId", async (req, res) => {
 });
 
 // Update a specific product by ID
-router.patch("/:productId", async (req, res) => {
+router.patch("/:productId", checkAuth, async (req, res) => {
   try {
     const id = req.params.productId;
     const updateOps = {};
@@ -153,7 +153,7 @@ router.patch("/:productId", async (req, res) => {
 });
 
 // Delete a specific product by ID
-router.delete("/:productId", async (req, res) => {
+router.delete("/:productId", checkAuth, async (req, res) => {
   try {
     const id = req.params.productId;
 

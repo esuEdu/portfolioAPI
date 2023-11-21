@@ -1,14 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
+const checkAuth = require('../middleware/check-auth');
+
 
 const Order = require('../models/order');
 const Product = require('../models/product');
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 
-// Get all orders
-router.get("/", async (req, res) => {
+router.get("/", checkAuth, async (req, res) => {
   try {
     const docs = await Order.find()
       .select("product quantity _id")
@@ -43,7 +44,7 @@ router.get("/", async (req, res) => {
 });
 
 // Create a new order
-router.post("/", async (req, res) => {
+router.post("/", checkAuth, async (req, res) => {
   try {
     const product = await Product.findById(req.body.productId);
 
@@ -89,7 +90,7 @@ router.post("/", async (req, res) => {
 });
 
 // Get a specific order by ID
-router.get("/:orderId", async (req, res) => {
+router.get("/:orderId", checkAuth, async (req, res) => {
   try {
     const order = await Order.findById(req.params.orderId)
       .populate('product', 'name price')
@@ -131,7 +132,7 @@ router.get("/:orderId", async (req, res) => {
 });
 
 // Delete a specific order by ID
-router.delete("/:orderId", async (req, res) => {
+router.delete("/:orderId", checkAuth, async (req, res) => {
   try {
     const result = await Order.deleteOne({ _id: req.params.orderId });
 
